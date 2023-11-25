@@ -79,3 +79,105 @@ void labwork( void )
       }
   }
 }
+
+
+
+/*
+_______________________________________________
+Object used as reference for creating functions 
+#define MAX_SNAKE_LENGTH 50
+
+struct Snake {
+    int x;
+    int y;
+    int length;
+    int tailX[MAX_SNAKE_LENGTH]; 
+    int tailY[MAX_SNAKE_LENGTH]; 
+};
+*/
+
+void changeXYDirection(struct Snake *snake) {
+    int buttons = getbtns();
+    if (buttons) {
+        // Save the current head position before updating
+        int currentHeadX = snake->x;
+        int currentHeadY = snake->y;
+
+        // BTN4: Decrease y-coordinate
+        if (buttons & 0x4) {
+            snake->y--;
+        }
+        // BTN3: Increase y-coordinate
+        if (buttons & 0x2) {
+            snake->y++;
+        }
+        // BTN2: Decrease x-coordinate
+        if (buttons & 0x1) {
+            snake->x--;
+        }
+        // BTN1: Increase x-coordinate, is it correct?
+        if (buttons & 0x0) {
+            snake->x++;
+        }
+
+        // Update the tail positions by shifting them
+        for (int i = snake->length - 1; i > 0; --i) {
+            snake->tailX[i] = snake->tailX[i - 1];
+            snake->tailY[i] = snake->tailY[i - 1];
+        }
+
+        // Update the first tail segment with the previous head position
+        snake->tailX[0] = currentHeadX;
+        snake->tailY[0] = currentHeadY;
+    }
+}
+
+void modifySnakeLength(struct Snake *snake, int newLength) {
+    snake->length = newLength;
+}
+
+void wallCollision(const struct Snake *snake) {
+    if (snake->x == 0) {
+        printf("Crash");
+    }
+    if (snake->x == 100) {
+        printf("Crash");
+    }
+    if (snake->y == 0) {
+        printf("Crash");
+    }
+    if (snake->y == 100) {
+        printf("Crash");
+    }
+}
+
+void selfCollision(const struct Snake *snake) {
+    for (int i = 0; i < snake->length; ++i) {
+        if (snake->x == snake->tailX[i] && snake->y == snake->tailY[i]) {
+            printf("crash");
+        }
+    }
+    return 0; 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
