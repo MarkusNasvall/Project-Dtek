@@ -104,32 +104,57 @@ void changeXYDirection(struct Snake *snake) {
         int currentHeadY = snake->y;
 
         // BTN4: Decrease y-coordinate
-        if (buttons & 0x4) {
-            snake->y--;
+        if (snake->direction != 'UP') {
+            if (buttons & 0x8) {
+            snake->direction = 'DOWN';
+            }
         }
         // BTN3: Increase y-coordinate
-        if (buttons & 0x2) {
-            snake->y++;
+        if (snake->direction != 'DOWN') {
+            if (buttons & 0x4) {
+            snake->direction = 'UP';
+            }
         }
         // BTN2: Decrease x-coordinate
-        if (buttons & 0x1) {
-            snake->x--;
+        if (snake->direction != 'RIGHT') {
+            if (buttons & 0x2) {
+            snake->direction = 'LEFT';
+            }
         }
         // BTN1: Increase x-coordinate, is it correct?
-        if (buttons & 0x0) {
-            snake->x++;
+        if (snake->direction != 'LEFT') {
+            if (buttons & 0x1) {
+            snake->direction = 'RIGHT';
+            }
         }
-
-        // Update the tail positions by shifting them
-        for (int i = snake->length - 1; i > 0; --i) {
-            snake->tailX[i] = snake->tailX[i - 1];
-            snake->tailY[i] = snake->tailY[i - 1];
-        }
-
-        // Update the first tail segment with the previous head position
-        snake->tailX[0] = currentHeadX;
-        snake->tailY[0] = currentHeadY;
     }
+
+    // Change coordinates based on snake's direction
+    if (snake->direction == 'DOWN') {
+        snake->y--;
+    }
+
+    if (snake->direction == 'UP') {
+        snake->y++;
+    }
+
+    if (snake->direction == 'LEFT') {
+        snake->x--;
+    }
+
+    if (snake->direction == 'RIGHT') {
+        snake->x++;
+    }
+
+    // Update the tail positions by shifting them
+    for (int i = snake->length - 1; i > 0; --i) {
+        snake->tailX[i] = snake->tailX[i - 1];
+        snake->tailY[i] = snake->tailY[i - 1];
+    }
+
+    // Update the first tail segment with the previous head position
+    snake->tailX[0] = currentHeadX;
+    snake->tailY[0] = currentHeadY;
 }
 
 void modifySnakeLength(struct Snake *snake, int newLength) {
