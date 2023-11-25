@@ -58,19 +58,24 @@ void labwork( void )
 
       // For BTN4: Copy SW4-SW1 to the first digit of mytime
       // We check for 0x4 because in binary it looks like 0100 which means that button 4 was pressed
-      if(buttons & 0x4) {
+      if(buttons & 0x8) {
           // We mask my time with 0x0FFF because it looks like this in binary: 0000 1111 1111 1111 which will clear the bits of the first digit in "mytime" variable, we then use the logical OR operator | to combine the two values. After that, we move the 4 LSB's in "switches" 12 steps to the left and insert them in the 4 MSB's in "mytime"
           mytime = (mytime & 0x0FFF) | (switches << 12);
       }
 
       // For BTN3: Copy SW4-SW1 to the second digit of mytime
-      if(buttons & 0x2) {
+      if(buttons & 0x4) {
           mytime = (mytime & 0xF0FF) | (switches << 8);
       }
 
       // For BTN2: Copy SW4-SW1 to the third digit of mytime
-      if(buttons & 0x1) {
+      if(buttons & 0x2) {
           mytime = (mytime & 0xFF0F) | (switches << 4);
+      }
+
+      // For BTN1: Do whatever
+      if(buttons & 0x1) {
+        return;
       }
   }
 }

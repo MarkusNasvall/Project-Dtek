@@ -12,6 +12,7 @@ int getsw(void) {
 /* Function to read the current status of the push-buttons BTN2, BTN3, and BTN4 and return it */
 int getbtns (void) {
     /* We will do the same as we did in function getsw but this time we will use 0x00E0 since it has the binary representation 0000000011100000 */
-    int buttons = (PORTD & 0x00E0) >> 5; 
+    int buttons = (PORTD & 0x00E0) >> 4;
+    buttons = buttons | ((PORTF >> 1) & 0x1); 
     return buttons;
 }
