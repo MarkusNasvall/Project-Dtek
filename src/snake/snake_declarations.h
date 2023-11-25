@@ -31,6 +31,8 @@ Apple apple;
 struct Snake {
     int x;
     int y;
+    int speed;
+    char direction; 
     int length;
     int tailX[MAX_SNAKE_LENGTH]; 
     int tailY[MAX_SNAKE_LENGTH]; 
