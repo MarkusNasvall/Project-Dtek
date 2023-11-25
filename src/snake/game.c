@@ -13,6 +13,8 @@
 #include <stdint.h>   /* Declarations of uint_32 and the like */
 #include "pic32mx.h"  /* Declarations of system-specific addresses etc */
 #include "mipslab.h"  /* Declatations for these labs */
+#include "snake_declarations.h" // For object declarations
+#include <stdlib.h>  // For rand() function
 
 int mytime = 0x5957;
 
@@ -84,17 +86,16 @@ void labwork( void )
 
 /*
 _______________________________________________
-Object used as reference for creating functions 
-#define MAX_SNAKE_LENGTH 50
+Snake functions
 
-struct Snake {
-    int x;
-    int y;
-    int length;
-    int tailX[MAX_SNAKE_LENGTH]; 
-    int tailY[MAX_SNAKE_LENGTH]; 
-};
 */
+
+void initializeSnake(struct Snake *snake) {
+    snake->x = getRandomNumber(100);
+    snake->y = getRandomNumber(100);
+    
+    snake->length = 0;  
+}
 
 void changeXYDirection(struct Snake *snake) {
     int buttons = getbtns();
@@ -183,6 +184,102 @@ void selfCollision(const struct Snake *snake) {
         }
     }
     return 0; 
+}
+
+/*
+_______________________________________________
+Apple functions
+
+*/
+
+void initializeApple(struct Apple *apple) {
+    // Set initial coordinates for the apple
+    apple->x = getRandomNumber(100);
+    apple->y = getRandomNumber(100);
+}
+
+int checkAppleCollision(struct Snake snake, struct Apple apple) {
+    for (int i = 0; i < snake.length; ++i) {
+        if (snake.tailX[i] == apple.x && snake.tailY[i] == apple.y) {
+            return 1; 
+        }
+    }
+    return 0;  
+}
+
+void AppleCollisionActions(struct Snake snake, struct Apple *apple) {
+    if (checkAppleCollision(snake, *apple)) {
+        //Chose randomnumber to max be 100, temporarily
+        apple->x = getRandomNumber(100);
+        apple->y = getRandomNumber(100);
+    }
+}
+
+/*
+____________________________________________________
+Helper functions
+
+*/
+
+int getRandomNumber(int max) {
+    return rand() % max;
+}
+
+/*
+
+
+/*
+_____________________________________________________
+Start, Play & End game functions 
+
+*/
+
+void startGame(struct Snake *snake, struct Apple *apple) {
+    int buttons = getbtns();
+    int running = 1;
+    while(running) {
+        while(!(buttons & 0x1)) {
+            //BTN2
+            buttons = getbtns();
+            display_string(5, "Start game by pressing BTN2");
+        } 
+        running=0;
+        initializeApple(apple); 
+        initializeSnake(snake);
+    }
+
+}
+
+void playGame(struct Snake *snake, struct Apple *apple) {
+    int running = 1;
+    while(running) {
+        changeXYDirection(snake);
+
+        if(wallCollision(snake)) {
+            running = 0;
+        }
+        if(selfCollision(snake)) {
+            running = 0;
+        }
+        if (checkAppleCollision(*snake, *apple)) {
+            AppleCollisionActions(*snake, apple);
+        }
+
+        display_update();
+    }    
+}
+
+void Endgame (void) {
+    int buttons = getbtns();
+    int running = 1;
+    while(running) {
+        while(!(buttons & 0x4)) {
+            //BTN4
+            buttons = getbtns();
+            display_string(5, "Game over, End game by pressing BTN4");
+        }
+        running=0;
+    }
 }
 
 
