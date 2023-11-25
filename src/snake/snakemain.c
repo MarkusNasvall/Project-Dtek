@@ -10,6 +10,7 @@
 #include <stdint.h>   /* Declarations of uint_32 and the like */
 #include "pic32mx.h"  /* Declarations of system-specific addresses etc */
 #include "mipslab.h"  /* Declatations for these labs */
+#include "snake_declarations.h" 
 
 int main(void) {
         /*
@@ -65,7 +66,13 @@ int main(void) {
 
 	while( 1 )
 	{
-	  labwork(); //Main function goes here
+		//Main function goes here
+		struct Snake snake;
+		struct Apple apple;
+		
+		startGame(snake, apple);
+		playGame(snake, apple);
+		Endgame();
 	}
 	return 0;
 }
