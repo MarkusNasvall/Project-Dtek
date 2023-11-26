@@ -61,8 +61,6 @@ int main(void) {
 	display_string(2, "Engineering");
 	display_string(3, "Welcome!");
 	display_update();
-	
-	labinit(); /* Do any lab-specific initialization */
 
 	while( 1 )
 	{

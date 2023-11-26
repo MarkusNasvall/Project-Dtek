@@ -8,9 +8,6 @@
 #include "pic32mx.h"  /* Declarations of system-specific addresses etc */
 #include "mipslab.h"  /* Declatations for these labs */
 
-/* Declare a helper function which is local to this file */
-static void num32asc( char * s, int ); 
-
 #define DISPLAY_CHANGE_TO_COMMAND_MODE (PORTFCLR = 0x10)
 #define DISPLAY_CHANGE_TO_DATA_MODE (PORTFSET = 0x10)
 
@@ -23,6 +20,11 @@ static void num32asc( char * s, int );
 #define DISPLAY_TURN_OFF_VDD (PORTFSET = 0x40)
 #define DISPLAY_TURN_OFF_VBAT (PORTFSET = 0x20)
 
+/* Declare a 2D map array that tells us which pixel in the OLED screen will be lit. The screen contains 32 rows and 128 columns. */
+uint8_t TwoD_Map[32][128];
+/* Declare an array that contains all the pixels in one dimension. It's size is 512 because 32*128=4096 and the size of an unsigned integer is 1 byte = 8 bits, so 4096 / 8 = 512*/
+uint8_t OneD_Map[512];
+
 /* quicksleep:
    A simple function to create a small delay.
    Very inefficient use of computing resources,
@@ -30,28 +32,6 @@ static void num32asc( char * s, int );
 void quicksleep(int cyc) {
 	int i;
 	for(i = cyc; i > 0; i--);
-}
-
-/* display_debug
-   A function to help debugging.
-
-   After calling display_debug,
-   the two middle lines of the display show
-   an address and its current contents.
-
-   There's one parameter: the address to read and display.
-
-   Note: When you use this function, you should comment out any
-   repeated calls to display_image; display_image overwrites
-   about half of the digits shown by display_debug.
-*/   
-void display_debug( volatile int * const addr )
-{
-  display_string( 1, "Addr" );
-  display_string( 2, "Data" );
-  num32asc( &textbuffer[1][6], (int) addr );
-  num32asc( &textbuffer[2][6], *addr );
-  display_update();
 }
 
 uint8_t spi_send_recv(uint8_t data) {
@@ -149,12 +129,49 @@ void display_update(void) {
 	}
 }
 
-/* Helper function, local to this file.
-   Converts a number to hexadecimal ASCII digits. */
-static void num32asc( char * s, int n ) 
-{
-  int i;
-  for( i = 28; i >= 0; i -= 4 )
-    *s++ = "0123456789ABCDEF"[ (n >> i) & 15 ];
+/* Function to convert a 2D array into 1D array to be used in the display_image function*/
+void convert_to_1d_array() {
+    int row, col;
+    int index = 0;
+
+    for (row = 0; row < 32; row++) {
+        for (col = 0; col < 128; col += 8) {
+            uint8_t byte = 0;
+            int bit;
+
+            for (bit = 0; bit < 8; bit++) {
+                byte |= (TwoD_Map[row][col + bit] & 0x01) << bit;
+            }
+
+            OneD_Map[index++] = byte;
+        }
+    }
 }
+
+/* Function to set all pixels in the display to 0*/
+void clearDisplay() { 
+	int row, column, i;
+
+	for(row = 0; row < 32; row++) {
+		for(column = 0; column < 128; column++) {
+			TwoD_Map[row][column] = 0;
+		}
+	}
+
+	for (i = 0; i < 512; i++) {
+	OneD_Map[i] = 0;
+	}
+}
+
+void beginDisplay() {
+	clearDisplay();
+	
+	/* Here you should call the function that starts the game.
+	It is important that this function draws the snake by manipulating each pixel in the TwoD_Map array*/
+
+	convert_to_1d_array();
+	display_image(0, OneD_Map);
+
+}
+
 
