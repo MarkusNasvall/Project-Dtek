@@ -7,6 +7,7 @@
 #include <stdint.h>   /* Declarations of uint_32 and the like */
 #include "pic32mx.h"  /* Declarations of system-specific addresses etc */
 #include "mipslab.h"  /* Declatations for these labs */
+#include "snake_declarations.h"
 
 #define DISPLAY_CHANGE_TO_COMMAND_MODE (PORTFCLR = 0x10)
 #define DISPLAY_CHANGE_TO_DATA_MODE (PORTFSET = 0x10)
@@ -19,11 +20,6 @@
 
 #define DISPLAY_TURN_OFF_VDD (PORTFSET = 0x40)
 #define DISPLAY_TURN_OFF_VBAT (PORTFSET = 0x20)
-
-/* Declare a 2D map array that tells us which pixel in the OLED screen will be lit. The screen contains 32 rows and 128 columns. */
-uint8_t TwoD_Map[32][128];
-/* Declare an array that contains all the pixels in one dimension. It's size is 512 because 32*128=4096 and the size of an unsigned integer is 1 byte = 8 bits, so 4096 / 8 = 512*/
-uint8_t OneD_Map[512];
 
 /* quicksleep:
    A simple function to create a small delay.
@@ -100,8 +96,8 @@ void display_image(int x, const uint8_t *data) {
 		
 		DISPLAY_CHANGE_TO_DATA_MODE;
 		
-		for(j = 0; j < 32; j++)
-			spi_send_recv(~data[i*32 + j]);
+		for(j = 0; j < 128; j++)
+			spi_send_recv(data[i*128 + j]);
 	}
 }
 
@@ -131,20 +127,17 @@ void display_update(void) {
 
 /* Function to convert a 2D array into 1D array to be used in the display_image function*/
 void convert_to_1d_array() {
-    int row, col;
-    int index = 0;
+	int i, row;
+    for (i = 0; i < 512; ++i) {
+        int page = i / 128;
+        int column = i % 128;
+        uint8_t coordinate = 0;
 
-    for (row = 0; row < 32; row++) {
-        for (col = 0; col < 128; col += 8) {
-            uint8_t byte = 0;
-            int bit;
-
-            for (bit = 0; bit < 8; bit++) {
-                byte |= (TwoD_Map[row][col + bit] & 0x01) << bit;
-            }
-
-            OneD_Map[index++] = byte;
+        for (row = 0; row < 8; ++row) {
+            coordinate |= (TwoD_Map[8 * page + row][column] << row);
         }
+
+        OneD_Map[i] = coordinate;
     }
 }
 
@@ -163,11 +156,13 @@ void clearDisplay() {
 	}
 }
 
-void beginDisplay() {
+void displayFrame(struct Snake *snake, struct Apple *apple) {
 	clearDisplay();
+	delay(500);
+	draw_snake(snake);
+	draw_apple(apple);
 	convert_to_1d_array();
 	display_image(0, OneD_Map);
-
 }
 
 

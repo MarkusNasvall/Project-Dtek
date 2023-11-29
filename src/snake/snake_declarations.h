@@ -4,7 +4,7 @@
 /* Declare a 2D map array that tells us which pixel in the OLED screen will be lit. The screen contains 32 rows and 128 columns. */
 uint8_t TwoD_Map[32][128];
 /* Declare an array that contains all the pixels in one dimension. It's size is 512 because 32*128=4096 and the size of an unsigned integer is 1 byte = 8 bits, so 4096 / 8 = 512*/
-uint8_t OneD_Map[4000];
+uint8_t OneD_Map[512];
 
 /*
 // Define the structure for the snake
@@ -47,4 +47,9 @@ struct Apple {
 };
 
 
-void beginDisplay();
+void displayFrame(struct Snake *snake, struct Apple *apple);
+void draw_snake(struct Snake *snake);
+void startGame(struct Snake *snake, struct Apple *apple);
+void playGame(struct Snake *snake, struct Apple *apple);
+void Endgame (void);
+void draw_apple(struct Apple *apple);

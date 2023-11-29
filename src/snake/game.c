@@ -8,7 +8,6 @@
 #include "pic32mx.h"  /* Declarations of system-specific addresses etc */
 #include "mipslab.h"  /* Declatations for these labs */
 #include "snake_declarations.h" // For object declarations
-#include <stdlib.h>  // For rand() function
 #include <stdbool.h>
 
 // Define the parameters for the LCG
@@ -34,12 +33,19 @@ Function to draw the snake in a 2D array
 void draw_snake(struct Snake *snake){
     int k, x, y;
 
-    for (k = 0; k < MAX_SNAKE_LENGTH; k++) {
+    for (k = 0; k < snake->length; k++) {
         x = snake->tailX[k];
         y = snake->tailY[k];
 
         TwoD_Map[y][x] = 1;
     }
+}
+
+void draw_apple(struct Apple *apple){
+    int x, y;
+    x = apple->x;
+    y = apple->y;
+    TwoD_Map[y][x] = 1;
 }
 
 
@@ -50,19 +56,40 @@ Snake functions
 */
 
 void initializeSnake(struct Snake *snake) {
-    snake->tailX[0] = 64
-    snake->tailX[0] = 16
+
+    //Copied this initialization from github just for testing. We can then create a for loop that sets each index to a random number generated from the start for example.
+	snake->tailY[0] = 16; 
+	snake->tailX[0] = 64; 
+	snake->tailY[1] = 16;
+	snake->tailX[1] = 65;
+	snake->tailY[2] = 16;
+	snake->tailX[2] = 66;
+	snake->tailY[3] = 16;
+	snake->tailX[3] = 67;
+	snake->tailY[4] = 16;
+	snake->tailX[4] = 68;
+	snake->tailY[5] = 16;
+	snake->tailX[5] = 69;
+	snake->tailY[6] = 16;
+	snake->tailX[6] = 70;
+	snake->tailY[7] = 16;
+	snake->tailX[7] = 71;
+	snake->tailY[8] = 16;
+	snake->tailX[8] = 72;
+	snake->tailY[9] = 16;
+	snake->tailX[9] = 73;
     
-    snake->length = 1;  
+    snake->length = 10;  
     snake->direction = 'L';
 }
 
 void changeXYDirection(struct Snake *snake) {
     int buttons = getbtns();
+    int previousHeadX, previousHeadY;
     if (buttons) {
         // Save the current head position before updating
-        int previousHeadX = snake->tailX[0]; 
-        int previousHeadY = snake->tailY[0];
+        previousHeadX = snake->tailX[0]; 
+        previousHeadY = snake->tailY[0];
 
         /* Here we will use single characters to resemble directions since it is a bit complicated to compare strings in C:
         U = up
@@ -95,6 +122,13 @@ void changeXYDirection(struct Snake *snake) {
         }
     }
 
+    //Update the tail positions by shifting them
+    int i;
+    for (i = snake->length - 1; i > 0; --i) {
+        snake->tailX[i] = snake->tailX[i - 1];
+        snake->tailY[i] = snake->tailY[i - 1];
+    }
+
     // Change coordinates based on snake's direction
     if (snake->direction == 'D') {
         snake->tailY[0]--;
@@ -112,28 +146,24 @@ void changeXYDirection(struct Snake *snake) {
         snake->tailX[0]++;
     }
 
-    //Update the tail positions by shifting them
-    for (int i = snake->length - 1; i > 1; --i) {
-        snake->tailX[i] = snake->tailX[i - 1];
-        snake->tailY[i] = snake->tailY[i - 1];
-    }
+
 
     //Shift second element
-    snake->tailX[i] = previousHeadX;
-    snake->tailY[i] = previousHeadY;
+    //snake->tailX[i] = previousHeadX;
+    //snake->tailY[i] = previousHeadY;
 }
 
 bool wallCollision(const struct Snake *snake) {
-    if (snake->0 == 0) {
+    if (snake->tailX[0] == 0) {
         return 1;
     }
-    if (snake->x == 128) {
+    if (snake->tailX[0] == 128) {
         return 1;
     }
-    if (snake->y == 0) {
+    if (snake->tailY[0] == 0) {
         return 1;
     }
-    if (snake->y == 32) {
+    if (snake->tailY[0] == 32) {
         return 1;
     }
 }
@@ -174,7 +204,7 @@ void AppleCollisionActions(struct Snake snake, struct Apple *apple) {
         apple->y = getRandomNumber(30) + 1;
     }
     score++;
-    snake->length++:
+    snake.length++;
     //Add code for increasing the snake length in the array.
 }
 
@@ -209,23 +239,25 @@ void startGame(struct Snake *snake, struct Apple *apple) {
     int running = 1;
     while(running) {
         while(!(buttons & 0x2)) {
-            display_string(1, "Start game by pressing BTN2");
+            display_string(0, "Start game");
+            display_string(1, "by pressing BTN2");
             display_update();
             buttons = getbtns();
+            if(buttons & 0x2) {
+                running = 0;
+            }
         } 
-        running=0;
-        initializeApple(apple); 
-        initializeSnake(snake);
     }
+
+    initializeApple(apple); 
+    initializeSnake(snake);
 
 }
 
 void playGame(struct Snake *snake, struct Apple *apple) {
     int running = 1;
     while(running) {
-        draw_snake(snake);
-        beginDisplay();
-
+        displayFrame(snake, apple);
         changeXYDirection(snake);
 
         if(wallCollision(snake)) {
@@ -237,7 +269,6 @@ void playGame(struct Snake *snake, struct Apple *apple) {
         if (checkAppleCollision(*snake, *apple)) {
             AppleCollisionActions(*snake, apple);
         }
-
     }    
 }
 

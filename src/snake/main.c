@@ -61,10 +61,13 @@ int main(void) {
 		//Main function goes here
 		struct Snake snake;
 		struct Apple apple;
-		startGame(snake, apple);
-		beginDisplay(snake, apple);
-		playGame(snake, apple);
-		Endgame();
+		//initializeSnake(&snake);
+		
+		startGame(&snake, &apple);
+		while(1) {
+			playGame(&snake, &apple);
+		}
+
 	}
 	return;
 }
