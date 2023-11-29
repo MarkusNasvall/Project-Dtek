@@ -24,6 +24,25 @@ void user_isr( void )
   return;
 }
 
+
+/*
+_____________________________________________________
+Function to draw the snake in a 2D array
+
+*/
+
+void draw_snake(struct Snake *snake){
+    int k, x, y;
+
+    for (k = 0; k < MAX_SNAKE_LENGTH; k++) {
+        x = snake->tailX[k];
+        y = snake->tailY[k];
+
+        TwoD_Map[y][x] = 1;
+    }
+}
+
+
 /*
 _______________________________________________
 Snake functions
@@ -35,6 +54,7 @@ void initializeSnake(struct Snake *snake) {
     snake->y = getRandomNumber(100);
     
     snake->length = 0;  
+    snake->direction = 'L';
 }
 
 void changeXYDirection(struct Snake *snake) {
@@ -198,10 +218,10 @@ void startGame(struct Snake *snake, struct Apple *apple) {
     int buttons = getbtns();
     int running = 1;
     while(running) {
-        while(!(buttons & 0x1)) {
-            //BTN2
+        while(!(buttons & 0x2)) {
+            display_string(1, "Start game by pressing BTN2");
+            display_update();
             buttons = getbtns();
-            display_string(5, "Start game by pressing BTN2");
         } 
         running=0;
         initializeApple(apple); 
@@ -213,6 +233,9 @@ void startGame(struct Snake *snake, struct Apple *apple) {
 void playGame(struct Snake *snake, struct Apple *apple) {
     int running = 1;
     while(running) {
+        draw_snake(snake);
+        beginDisplay();
+
         changeXYDirection(snake);
 
         if(wallCollision(snake)) {
@@ -225,7 +248,6 @@ void playGame(struct Snake *snake, struct Apple *apple) {
             AppleCollisionActions(*snake, apple);
         }
 
-        display_update();
     }    
 }
 
@@ -241,13 +263,6 @@ void Endgame (void) {
         running=0;
     }
 }
-
-
-
-
-
-
-
 
 
 

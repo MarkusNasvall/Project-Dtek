@@ -165,10 +165,6 @@ void clearDisplay() {
 
 void beginDisplay() {
 	clearDisplay();
-	
-	/* Here you should call the function that starts the game.
-	It is important that this function draws the snake by manipulating each pixel in the TwoD_Map array*/
-
 	convert_to_1d_array();
 	display_image(0, OneD_Map);
 
