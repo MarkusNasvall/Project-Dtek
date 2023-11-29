@@ -50,10 +50,10 @@ Snake functions
 */
 
 void initializeSnake(struct Snake *snake) {
-    snake->x = getRandomNumber(100);
-    snake->y = getRandomNumber(100);
+    snake->tailX[0] = 64
+    snake->tailX[0] = 16
     
-    snake->length = 0;  
+    snake->length = 1;  
     snake->direction = 'L';
 }
 
@@ -61,8 +61,8 @@ void changeXYDirection(struct Snake *snake) {
     int buttons = getbtns();
     if (buttons) {
         // Save the current head position before updating
-        int currentHeadX = snake->x;
-        int currentHeadY = snake->y;
+        int previousHeadX = snake->tailX[0]; 
+        int previousHeadY = snake->tailY[0];
 
         /* Here we will use single characters to resemble directions since it is a bit complicated to compare strings in C:
         U = up
@@ -97,61 +97,51 @@ void changeXYDirection(struct Snake *snake) {
 
     // Change coordinates based on snake's direction
     if (snake->direction == 'D') {
-        snake->y--;
+        snake->tailY[0]--;
     }
 
     if (snake->direction == 'U') {
-        snake->y++;
+        snake->tailY[0]++;
     }
 
     if (snake->direction == 'L') {
-        snake->x--;
+        snake->tailX[0]--;
     }
 
     if (snake->direction == 'R') {
-        snake->x++;
+        snake->tailX[0]++;
     }
 
-    // Update the tail positions by shifting them
-    int i;
-    for (i = snake->length - 1; i > 0; --i) {
+    //Update the tail positions by shifting them
+    for (int i = snake->length - 1; i > 1; --i) {
         snake->tailX[i] = snake->tailX[i - 1];
         snake->tailY[i] = snake->tailY[i - 1];
     }
 
-    // Update the first tail segment with the previous head position
-    int currentHeadX = snake->tailX[0];
-    int currentHeadY = snake->tailY[0];
-}
-
-void modifySnakeLength(struct Snake *snake, int newLength) {
-    snake->length = newLength;
+    //Shift second element
+    snake->tailX[i] = previousHeadX;
+    snake->tailY[i] = previousHeadY;
 }
 
 bool wallCollision(const struct Snake *snake) {
-    if (snake->x == 0) {
-        display_string(1, "Crash");
+    if (snake->0 == 0) {
         return 1;
     }
-    if (snake->x == 100) {
-        display_string(1, "Crash");
+    if (snake->x == 128) {
         return 1;
     }
     if (snake->y == 0) {
-        display_string(1, "Crash");
         return 1;
     }
-    if (snake->y == 100) {
-        display_string(1, "Crash");
+    if (snake->y == 32) {
         return 1;
     }
 }
 
 bool selfCollision(const struct Snake *snake) {
     int i;
-    for (i = 0; i < snake->length; ++i) {
-        if (snake->x == snake->tailX[i] && snake->y == snake->tailY[i]) {
-            display_string(1, "Crash");
+    for (i = 1; i < snake->length; ++i) {
+        if (snake->tailX[0] == snake->tailX[i] && snake->tailY[0] == snake->tailY[i]) {
             return 1;
         }
     }
@@ -165,26 +155,27 @@ Apple functions
 
 void initializeApple(struct Apple *apple) {
     // Set initial coordinates for the apple
-    apple->x = getRandomNumber(100);
-    apple->y = getRandomNumber(100);
+    apple->x = getRandomNumber(126) + 1;
+    apple->y = getRandomNumber(30) + 1;
 }
 
 int checkAppleCollision(struct Snake snake, struct Apple apple) {
-    int i;
-    for (i = 0; i < snake.length; ++i) {
-        if (snake.tailX[i] == apple.x && snake.tailY[i] == apple.y) {
-            return 1; 
-        }
+    if (snake.tailX[0] == apple.x && snake.tailY[0] == apple.y) {
+        return 1; 
     }
     return 0;  
 }
 
+int score; 
+
 void AppleCollisionActions(struct Snake snake, struct Apple *apple) {
     if (checkAppleCollision(snake, *apple)) {
-        //Chose randomnumber to max be 100, temporarily
-        apple->x = getRandomNumber(100);
-        apple->y = getRandomNumber(100);
+        apple->x = getRandomNumber(126) + 1;
+        apple->y = getRandomNumber(30) + 1;
     }
+    score++;
+    snake->length++:
+    //Add code for increasing the snake length in the array.
 }
 
 /*
@@ -206,7 +197,6 @@ int getRandomNumber(int max) {
     // Return a pseudo-random number (you can adjust the range as needed)
     return (int)(prng_state % max);
 }
-
 
 /*
 _____________________________________________________

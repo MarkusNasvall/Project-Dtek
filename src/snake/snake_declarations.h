@@ -34,8 +34,6 @@ Apple apple;
 #define MAX_SNAKE_LENGTH 50
 
 struct Snake {
-    int x;
-    int y;
     int speed;
     char direction; 
     int length;
