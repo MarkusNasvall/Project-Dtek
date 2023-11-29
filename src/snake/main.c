@@ -64,7 +64,7 @@ int main(void) {
 		//initializeSnake(&snake);
 		
 		startGame(&snake, &apple);
-		while(1) {
+		while(globalBegin) {
 			playGame(&snake, &apple);
 		}
 

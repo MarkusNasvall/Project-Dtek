@@ -14,6 +14,9 @@
 #define PRNG_A 1664525
 #define PRNG_C 1013904223
 
+// Variable to begin the game
+int globalBegin = 0;
+
 // Global variable to store the current state of the PRNG
 static uint32_t prng_state = 0;
 
@@ -248,7 +251,7 @@ void startGame(struct Snake *snake, struct Apple *apple) {
             }
         } 
     }
-
+    globalBegin = 1;
     initializeApple(apple); 
     initializeSnake(snake);
 

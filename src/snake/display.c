@@ -158,7 +158,7 @@ void clearDisplay() {
 
 void displayFrame(struct Snake *snake, struct Apple *apple) {
 	clearDisplay();
-	delay(500);
+	delay(100);
 	draw_snake(snake);
 	draw_apple(apple);
 	convert_to_1d_array();

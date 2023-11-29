@@ -32,6 +32,7 @@ Apple apple;
 */
 
 #define MAX_SNAKE_LENGTH 50
+extern int globalBegin;
 
 struct Snake {
     int speed;
