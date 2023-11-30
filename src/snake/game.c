@@ -59,41 +59,18 @@ Snake functions
 */
 
 void initializeSnake(struct Snake *snake) {
-
-    //Copied this initialization from github just for testing. We can then create a for loop that sets each index to a random number generated from the start for example.
-	snake->tailY[0] = 16; 
-	snake->tailX[0] = 64; 
-	snake->tailY[1] = 16;
-	snake->tailX[1] = 65;
-	snake->tailY[2] = 16;
-	snake->tailX[2] = 66;
-	snake->tailY[3] = 16;
-	snake->tailX[3] = 67;
-	snake->tailY[4] = 16;
-	snake->tailX[4] = 68;
-	snake->tailY[5] = 16;
-	snake->tailX[5] = 69;
-	snake->tailY[6] = 16;
-	snake->tailX[6] = 70;
-	snake->tailY[7] = 16;
-	snake->tailX[7] = 71;
-	snake->tailY[8] = 16;
-	snake->tailX[8] = 72;
-	snake->tailY[9] = 16;
-	snake->tailX[9] = 73;
-    
     snake->length = 10;  
     snake->direction = 'L';
+    int i;
+    for (i = 0; i < snake->length; ++i) {
+        snake->tailY[i] = 16;
+        snake->tailX[i] = 64 + i;
+    }
 }
 
 void changeXYDirection(struct Snake *snake) {
     int buttons = getbtns();
-    int previousHeadX, previousHeadY;
     if (buttons) {
-        // Save the current head position before updating
-        previousHeadX = snake->tailX[0]; 
-        previousHeadY = snake->tailY[0];
-
         /* Here we will use single characters to resemble directions since it is a bit complicated to compare strings in C:
         U = up
         D = down
@@ -148,12 +125,6 @@ void changeXYDirection(struct Snake *snake) {
     if (snake->direction == 'R') {
         snake->tailX[0]++;
     }
-
-
-
-    //Shift second element
-    //snake->tailX[i] = previousHeadX;
-    //snake->tailY[i] = previousHeadY;
 }
 
 void wallCollision(const struct Snake *snake) {
@@ -172,7 +143,8 @@ void wallCollision(const struct Snake *snake) {
 }
 
 void selfCollision(const struct Snake *snake) {
-    for (int i = 1; i < snake->length; ++i) {
+    int i;
+    for (i = 1; i < snake->length; ++i) {
         if (snake->tailX[0] == snake->tailX[i] && snake->tailY[0] == snake->tailY[i]) {
             globalBegin = 0;
         }
@@ -204,10 +176,49 @@ void AppleCollisionActions(struct Snake snake, struct Apple *apple) {
     if (checkAppleCollision(snake, *apple)) {
         apple->x = getRandomNumber(126) + 1;
         apple->y = getRandomNumber(30) + 1;
+//         int k = snake.length;
+// int p = 1;
+// snake.length = snake.length + 20;
+
+// // Add code for increasing the snake length in the array.
+// int i;
+// for (i = k; i < snake.length; ++i) {
+//     if (snake.direction == 'L') {
+//         snake.tailY[i] = snake.tailY[k - 1];
+//         snake.tailX[i] = snake.tailX[k - 1] - p;
+//     } else if (snake.direction == 'R') {
+//         snake.tailY[i] = snake.tailY[k - 1];
+//         snake.tailX[i] = snake.tailX[k - 1] + p;
+//     } else if (snake.direction == 'U') {
+//         snake.tailY[i] = snake.tailY[k - 1] - p;
+//         snake.tailX[i] = snake.tailX[k - 1];
+//     } else if (snake.direction == 'D') {
+//         snake.tailY[i] = snake.tailY[k - 1] + p;
+//         snake.tailX[i] = snake.tailX[k - 1];
+//     }
+//     p++;
+// }
     }
     score++;
-    snake.length++;
-    //Add code for increasing the snake length in the array.
+
+
+    // if(snake.tailX[snake.length-1]+1 != snake.tailX[snake.length-2]) {
+    //     snake.tailX[snake.length] = snake.tailX[snake.length-1]+1;
+    //     snake.tailY[snake.length] = snake.tailY[snake.length-1];
+    // }
+    // else if(snake.tailX[snake.length-1]-1 != snake.tailX[snake.length-2]) {
+    //     snake.tailX[snake.length] = snake.tailX[snake.length-1]-1;
+    //     snake.tailY[snake.length] = snake.tailY[snake.length-1];
+    // }
+    // else if(snake.tailY[snake.length-1]+1 != snake.tailY[snake.length-2]) {
+    //     snake.tailY[snake.length] = snake.tailY[snake.length-1]+1;
+    //     snake.tailX[snake.length] = snake.tailX[snake.length-1];
+    // }
+    // else if(snake.tailY[snake.length-1]-1 != snake.tailY[snake.length-2]) {
+    //     snake.tailY[snake.length] = snake.tailY[snake.length-1]-1;
+    //     snake.tailX[snake.length] = snake.tailX[snake.length-1];
+    // } 
+
 }
 
 /*
@@ -245,10 +256,9 @@ void startGame(struct Snake *snake, struct Apple *apple) {
             display_string(1, "by pressing BTN2");
             display_update();
             buttons = getbtns();
-            if(buttons & 0x2) {
-                running = 0;
-            }
         } 
+        //Exit loop
+        running = 0;
     }
     globalBegin = 1;
     initializeApple(apple); 
@@ -257,34 +267,39 @@ void startGame(struct Snake *snake, struct Apple *apple) {
 }
 
 void playGame(struct Snake *snake, struct Apple *apple) {
-    int running = 1;
-    while(running) {
+    while(globalBegin) {
         displayFrame(snake, apple);
         changeXYDirection(snake);
 
-        if(wallCollision(snake)) {
-            running = 0;
-        }
-        if(selfCollision(snake)) {
-            running = 0;
-        }
+        wallCollision(snake);
+        selfCollision(snake);
         if (checkAppleCollision(*snake, *apple)) {
             AppleCollisionActions(*snake, apple);
         }
     }    
 }
 
-void Endgame (void) {
+void Endgame () {
     int buttons = getbtns();
     int running = 1;
     while(running) {
-        while(!(buttons & 0x4)) {
+        while(!(buttons & 0x8)) {
+            clearDisplay();
+            display_string(0, "Game over,");
+            display_string(1, "end game by");
+            display_string(2, "pressing BTN4");
+            display_update();
             //BTN4
             buttons = getbtns();
-            display_string(5, "Game over, End game by pressing BTN4");
         }
-        running=0;
+        display_string(2, "\n");
+        display_update();
+        running = 0;
+
     }
+    struct Snake newSnake;
+	struct Apple newApple;
+    startGame(&newSnake, &newApple);
 }
 
 

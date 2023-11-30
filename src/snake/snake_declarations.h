@@ -31,7 +31,7 @@ typedef struct {
 Apple apple;
 */
 
-#define MAX_SNAKE_LENGTH 50
+#define MAX_SNAKE_LENGTH 128
 extern int globalBegin;
 
 struct Snake {
@@ -49,8 +49,9 @@ struct Apple {
 
 
 void displayFrame(struct Snake *snake, struct Apple *apple);
+void clearDisplay();
 void draw_snake(struct Snake *snake);
 void startGame(struct Snake *snake, struct Apple *apple);
 void playGame(struct Snake *snake, struct Apple *apple);
-void Endgame (void);
+void Endgame ();
 void draw_apple(struct Apple *apple);

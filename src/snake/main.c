@@ -67,6 +67,7 @@ int main(void) {
 		while(globalBegin) {
 			playGame(&snake, &apple);
 		}
+		Endgame();
 
 	}
 	return;
