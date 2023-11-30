@@ -156,26 +156,25 @@ void changeXYDirection(struct Snake *snake) {
     //snake->tailY[i] = previousHeadY;
 }
 
-bool wallCollision(const struct Snake *snake) {
+void wallCollision(const struct Snake *snake) {
     if (snake->tailX[0] == 0) {
-        return 1;
+        globalBegin = 0;
     }
     if (snake->tailX[0] == 128) {
-        return 1;
+        globalBegin = 0;
     }
     if (snake->tailY[0] == 0) {
-        return 1;
+        globalBegin = 0;
     }
     if (snake->tailY[0] == 32) {
-        return 1;
+        globalBegin = 0;
     }
 }
 
-bool selfCollision(const struct Snake *snake) {
-    int i;
-    for (i = 1; i < snake->length; ++i) {
+void selfCollision(const struct Snake *snake) {
+    for (int i = 1; i < snake->length; ++i) {
         if (snake->tailX[0] == snake->tailX[i] && snake->tailY[0] == snake->tailY[i]) {
-            return 1;
+            globalBegin = 0;
         }
     }
 }
