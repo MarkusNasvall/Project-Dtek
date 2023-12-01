@@ -8,7 +8,6 @@
 #include "pic32mx.h"  /* Declarations of system-specific addresses etc */
 #include "mipslab.h"  /* Declatations for these labs */
 #include "snake_declarations.h" // For object declarations
-#include <stdbool.h>
 
 // Define the parameters for the LCG
 #define PRNG_A 1664525
@@ -16,6 +15,8 @@
 
 // Variable to begin the game
 int globalBegin = 0;
+int score = 0;
+int speed = 120;
 
 // Global variable to store the current state of the PRNG
 static uint32_t prng_state = 0;
@@ -59,7 +60,7 @@ Snake functions
 */
 
 void initializeSnake(struct Snake *snake) {
-    snake->length = 10;  
+    snake->length = INITIAL_SNAKE_LENGTH;  
     snake->direction = 'L';
     int i;
     for (i = 0; i < snake->length; ++i) {
@@ -183,6 +184,14 @@ void increaseLength(struct Snake *snake) {
     }
 }
 
+/* Function to increase the speed */
+void increaseSpeed() {
+    if (speed >= 20) {
+        speed -= 10;
+    }
+    return;
+}
+
 /*
 _______________________________________________
 Apple functions
@@ -193,6 +202,7 @@ void initializeApple(struct Apple *apple) {
     // Set initial coordinates for the apple
     apple->x = getRandomNumber(126) + 1;
     apple->y = getRandomNumber(30) + 1;
+    increaseSpeed();
 }
 
 int checkAppleCollision(struct Snake *snake, struct Apple *apple) {
@@ -208,7 +218,7 @@ void AppleCollisionActions(struct Snake *snake, struct Apple *apple) {
         apple->y = getRandomNumber(30) + 1;
         increaseLength(snake);
     }
-    snake->score++;
+    score++;
 }
 
 /*
@@ -229,6 +239,30 @@ int getRandomNumber(int max) {
 
     // Return a pseudo-random number (you can adjust the range as needed)
     return (int)(prng_state % max);
+}
+
+// Function to convert an integer to a string
+void intToString(int n, char* buffer, int bufferSize) {
+    int i = bufferSize - 2; // Leave room for the null terminator
+    buffer[i + 1] = '\0';
+
+    // Handle the case of a zero
+    if (n == 0) {
+        buffer[i--] = '0';
+    } else {
+        // Handle positive integers
+        while (n > 0 && i >= 0) {
+            buffer[i--] = '0' + n % 10;
+            n /= 10;
+        }
+    }
+
+    // Copy the result to the beginning of the buffer
+    int length = bufferSize - 2 - i;
+    int j;
+    for (j = 0; j < length; ++j) {
+        buffer[j] = buffer[i + 1 + j];
+    }
 }
 
 /*
@@ -258,30 +292,44 @@ void startGame(struct Snake *snake, struct Apple *apple) {
 
 void playGame(struct Snake *snake, struct Apple *apple) {
     while(globalBegin) {
-        displayFrame(snake, apple);
         changeXYDirection(snake);
-
         wallCollision(snake);
         selfCollision(snake);
         if (checkAppleCollision(snake, apple)) {
             AppleCollisionActions(snake, apple);
         }
+        delay(speed);
+        displayFrame(snake, apple);
     }    
 }
 
 void Endgame () {
+    char scoreString[8]; // Assuming at most 3 digits for the score + "Score: " prefix
+
+    // Convert the score integer to a string
+    intToString(score, scoreString + 6, sizeof(scoreString) - 6);
+
+    // Add the "Score: " prefix
+    scoreString[0] = 'S';
+    scoreString[1] = 'c';
+    scoreString[2] = 'o';
+    scoreString[3] = 'r';
+    scoreString[4] = 'e';
+    scoreString[5] = ':';
+    
     int buttons = getbtns();
     int running = 1;
     while(running) {
         while(!(buttons & 0x8)) {
             clearDisplay();
-            display_string(0, "Game over,");
-            display_string(1, "end game by");
+            // Display the score
+            display_string(0, scoreString);
+            display_string(1, "End game by");
             display_string(2, "pressing BTN4");
             display_update();
-            //BTN4
             buttons = getbtns();
         }
+        // Display an empty string at the second line to clear the "pressing BTN4" String
         display_string(2, "\n");
         display_update();
         running = 0;
@@ -289,6 +337,7 @@ void Endgame () {
     }
     struct Snake newSnake;
 	struct Apple newApple;
+    score = 0;
     startGame(&newSnake, &newApple);
 }
 

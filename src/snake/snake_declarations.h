@@ -6,37 +6,14 @@ uint8_t TwoD_Map[32][128];
 /* Declare an array that contains all the pixels in one dimension. It's size is 512 because 32*128=4096 and the size of an unsigned integer is 1 byte = 8 bits, so 4096 / 8 = 512*/
 uint8_t OneD_Map[512];
 
-/*
-// Define the structure for the snake
-typedef struct {
-    int length;
-    int speed;
-    char direction; 
-    uint8_t x[NUM_COLUMNS];
-    uint8_t y[NUM_ROWS];
-} Snake;
-
-// Define a variable of type Snake
-Snake snake;
-*/
-
-/*
-// Define the structure for the apples
-typedef struct {
-    uint8_t x[NUM_COLUMNS];
-    uint8_t y[NUM_ROWS];
-} Apple;
-
-// Define a variable of type snake
-Apple apple;
-*/
-
 #define MAX_SNAKE_LENGTH 512
+#define INITIAL_SNAKE_LENGTH 10  // Initial size of the snake
 extern int globalBegin;
+extern int score;
+extern int speed;
 
 struct Snake {
     char direction; 
-    int score;
     int length;
     int tailX[MAX_SNAKE_LENGTH]; 
     int tailY[MAX_SNAKE_LENGTH]; 
