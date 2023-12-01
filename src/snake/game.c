@@ -77,24 +77,24 @@ void changeXYDirection(struct Snake *snake) {
         R = right
         L = left*/
         // BTN4: Decrease y-coordinate
-        if (snake->direction != 'U') {
-            if (buttons & 0x8) {
-            snake->direction = 'D';
-            }
-        }
-        // BTN3: Increase y-coordinate
-        if (snake->direction != 'D') {
-            if (buttons & 0x4) {
-            snake->direction = 'U';
-            }
-        }
-        // BTN2: Decrease x-coordinate
         if (snake->direction != 'R') {
-            if (buttons & 0x2) {
+            if (buttons & 0x8) {
             snake->direction = 'L';
             }
         }
-        // BTN1: Increase x-coordinate, is it correct?
+        // BTN3: Increase y-coordinate
+        if (snake->direction != 'U') {
+            if (buttons & 0x4) {
+            snake->direction = 'D';
+            }
+        }
+        // BTN2: Decrease x-coordinate
+        if (snake->direction != 'D') {
+            if (buttons & 0x2) {
+            snake->direction = 'U';
+            }
+        }
+        // BTN1: Increase x-coordinate
         if (snake->direction != 'L') {
             if (buttons & 0x1) {
             snake->direction = 'R';
@@ -111,11 +111,11 @@ void changeXYDirection(struct Snake *snake) {
 
     // Change coordinates based on snake's direction
     if (snake->direction == 'D') {
-        snake->tailY[0]--;
+        snake->tailY[0]++;
     }
 
     if (snake->direction == 'U') {
-        snake->tailY[0]++;
+        snake->tailY[0]--;
     }
 
     if (snake->direction == 'L') {
@@ -128,18 +128,10 @@ void changeXYDirection(struct Snake *snake) {
 }
 
 void wallCollision(const struct Snake *snake) {
-    if (snake->tailX[0] == 0) {
-        globalBegin = 0;
-    }
-    if (snake->tailX[0] == 128) {
-        globalBegin = 0;
-    }
-    if (snake->tailY[0] == 0) {
-        globalBegin = 0;
-    }
-    if (snake->tailY[0] == 32) {
-        globalBegin = 0;
-    }
+    if (snake->tailX[0] == 0 || snake->tailX[0] == 127 ||
+        snake->tailY[0] == 0 || snake->tailY[0] == 31) {
+            globalBegin = 0;
+        }
 }
 
 void selfCollision(const struct Snake *snake) {
@@ -148,6 +140,46 @@ void selfCollision(const struct Snake *snake) {
         if (snake->tailX[0] == snake->tailX[i] && snake->tailY[0] == snake->tailY[i]) {
             globalBegin = 0;
         }
+    }
+}
+
+void increaseLength(struct Snake *snake) {
+    int i, j;
+    int newY, newX;
+    
+    for (j = 0; j < 5; j++) {
+        // This will create a new segment of the snake based on which direction it goes to
+        switch (snake->direction) {
+            case 'U':
+                newY = snake->tailY[0] - 1;
+                newX = snake->tailX[0];
+                break;
+            case 'D':
+                newY = snake->tailY[0] + 1;
+                newX = snake->tailX[0];
+                break;
+            case 'L':
+                newY = snake->tailY[0];
+                newX = snake->tailX[0] - 1;
+                break;
+            case 'R':
+                newY = snake->tailY[0];
+                newX = snake->tailX[0] + 1;
+                break;
+        }
+
+		// Shift existing segments to make room for the new one
+        for (i = snake->length; i > 0; i--) {
+            snake->tailY[i] = snake->tailY[i - 1];
+            snake->tailX[i] = snake->tailX[i - 1];
+        }
+
+        // Add the new segment at the front 
+        snake->tailY[0] = newY;
+        snake->tailX[0] = newX;
+
+        // Increase the length of the snake
+        snake->length++;
     }
 }
 
@@ -163,62 +195,20 @@ void initializeApple(struct Apple *apple) {
     apple->y = getRandomNumber(30) + 1;
 }
 
-int checkAppleCollision(struct Snake snake, struct Apple apple) {
-    if (snake.tailX[0] == apple.x && snake.tailY[0] == apple.y) {
+int checkAppleCollision(struct Snake *snake, struct Apple *apple) {
+    if (snake->tailX[0] == apple->x && snake->tailY[0] == apple->y) {
         return 1; 
     }
     return 0;  
 }
 
-int score; 
-
-void AppleCollisionActions(struct Snake snake, struct Apple *apple) {
-    if (checkAppleCollision(snake, *apple)) {
+void AppleCollisionActions(struct Snake *snake, struct Apple *apple) {
+    if (checkAppleCollision(snake, apple)) {
         apple->x = getRandomNumber(126) + 1;
         apple->y = getRandomNumber(30) + 1;
-//         int k = snake.length;
-// int p = 1;
-// snake.length = snake.length + 20;
-
-// // Add code for increasing the snake length in the array.
-// int i;
-// for (i = k; i < snake.length; ++i) {
-//     if (snake.direction == 'L') {
-//         snake.tailY[i] = snake.tailY[k - 1];
-//         snake.tailX[i] = snake.tailX[k - 1] - p;
-//     } else if (snake.direction == 'R') {
-//         snake.tailY[i] = snake.tailY[k - 1];
-//         snake.tailX[i] = snake.tailX[k - 1] + p;
-//     } else if (snake.direction == 'U') {
-//         snake.tailY[i] = snake.tailY[k - 1] - p;
-//         snake.tailX[i] = snake.tailX[k - 1];
-//     } else if (snake.direction == 'D') {
-//         snake.tailY[i] = snake.tailY[k - 1] + p;
-//         snake.tailX[i] = snake.tailX[k - 1];
-//     }
-//     p++;
-// }
+        increaseLength(snake);
     }
-    score++;
-
-
-    // if(snake.tailX[snake.length-1]+1 != snake.tailX[snake.length-2]) {
-    //     snake.tailX[snake.length] = snake.tailX[snake.length-1]+1;
-    //     snake.tailY[snake.length] = snake.tailY[snake.length-1];
-    // }
-    // else if(snake.tailX[snake.length-1]-1 != snake.tailX[snake.length-2]) {
-    //     snake.tailX[snake.length] = snake.tailX[snake.length-1]-1;
-    //     snake.tailY[snake.length] = snake.tailY[snake.length-1];
-    // }
-    // else if(snake.tailY[snake.length-1]+1 != snake.tailY[snake.length-2]) {
-    //     snake.tailY[snake.length] = snake.tailY[snake.length-1]+1;
-    //     snake.tailX[snake.length] = snake.tailX[snake.length-1];
-    // }
-    // else if(snake.tailY[snake.length-1]-1 != snake.tailY[snake.length-2]) {
-    //     snake.tailY[snake.length] = snake.tailY[snake.length-1]-1;
-    //     snake.tailX[snake.length] = snake.tailX[snake.length-1];
-    // } 
-
+    snake->score++;
 }
 
 /*
@@ -273,8 +263,8 @@ void playGame(struct Snake *snake, struct Apple *apple) {
 
         wallCollision(snake);
         selfCollision(snake);
-        if (checkAppleCollision(*snake, *apple)) {
-            AppleCollisionActions(*snake, apple);
+        if (checkAppleCollision(snake, apple)) {
+            AppleCollisionActions(snake, apple);
         }
     }    
 }

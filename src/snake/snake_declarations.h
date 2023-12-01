@@ -31,12 +31,12 @@ typedef struct {
 Apple apple;
 */
 
-#define MAX_SNAKE_LENGTH 128
+#define MAX_SNAKE_LENGTH 512
 extern int globalBegin;
 
 struct Snake {
-    int speed;
     char direction; 
+    int score;
     int length;
     int tailX[MAX_SNAKE_LENGTH]; 
     int tailY[MAX_SNAKE_LENGTH]; 
