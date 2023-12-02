@@ -69,43 +69,28 @@ void initializeSnake(struct Snake *snake) {
     }
 }
 
-void changeXYDirection(struct Snake *snake) {
+/* Function to process input from the buttons*/
+void processInput(struct Snake *snake) {
     int buttons = getbtns();
+
     if (buttons) {
-        /* Here we will use single characters to resemble directions since it is a bit complicated to compare strings in C:
-        U = up
-        D = down
-        R = right
-        L = left*/
-        // BTN4: Decrease y-coordinate
-        if (snake->direction != 'R') {
-            if (buttons & 0x8) {
+        // Update the snake's direction based on button inputs
+        if (buttons & 0x8 && snake->direction != 'R') {
             snake->direction = 'L';
-            }
-        }
-        // BTN3: Increase y-coordinate
-        if (snake->direction != 'U') {
-            if (buttons & 0x4) {
+        } else if (buttons & 0x4 && snake->direction != 'U') {
             snake->direction = 'D';
-            }
-        }
-        // BTN2: Decrease x-coordinate
-        if (snake->direction != 'D') {
-            if (buttons & 0x2) {
+        } else if (buttons & 0x2 && snake->direction != 'D') {
             snake->direction = 'U';
-            }
-        }
-        // BTN1: Increase x-coordinate
-        if (snake->direction != 'L') {
-            if (buttons & 0x1) {
+        } else if (buttons & 0x1 && snake->direction != 'L') {
             snake->direction = 'R';
-            }
         }
     }
+}
 
-    //Update the tail positions by shifting them
-    int i;
-    for (i = snake->length - 1; i > 0; --i) {
+/* Function to move the snake by changing it's X and Y coordinates */
+void moveSnake(struct Snake *snake) {
+    // Update the tail positions by shifting them
+    for (int i = snake->length - 1; i > 0; --i) {
         snake->tailX[i] = snake->tailX[i - 1];
         snake->tailY[i] = snake->tailY[i - 1];
     }
@@ -113,17 +98,11 @@ void changeXYDirection(struct Snake *snake) {
     // Change coordinates based on snake's direction
     if (snake->direction == 'D') {
         snake->tailY[0]++;
-    }
-
-    if (snake->direction == 'U') {
+    } else if (snake->direction == 'U') {
         snake->tailY[0]--;
-    }
-
-    if (snake->direction == 'L') {
+    } else if (snake->direction == 'L') {
         snake->tailX[0]--;
-    }
-
-    if (snake->direction == 'R') {
+    } else if (snake->direction == 'R') {
         snake->tailX[0]++;
     }
 }
@@ -292,7 +271,8 @@ void startGame(struct Snake *snake, struct Apple *apple) {
 
 void playGame(struct Snake *snake, struct Apple *apple) {
     while(globalBegin) {
-        changeXYDirection(snake);
+        processInput(snake);
+        moveSnake(snake);
         wallCollision(snake);
         selfCollision(snake);
         if (checkAppleCollision(snake, apple)) {
