@@ -34,6 +34,7 @@ Function to draw the snake in a 2D array
 
 */
 
+// Draws snake onto display, pixel by pixel
 void draw_snake(struct Snake *snake){
     int k, x, y;
 
@@ -45,6 +46,7 @@ void draw_snake(struct Snake *snake){
     }
 }
 
+// Draws apple to display
 void draw_apple(struct Apple *apple){
     int x, y;
     x = apple->x;
@@ -59,6 +61,7 @@ Snake functions
 
 */
 
+// Sets starting size and position for snake
 void initializeSnake(struct Snake *snake) {
     snake->length = INITIAL_SNAKE_LENGTH;  
     snake->direction = 'L';
@@ -107,6 +110,7 @@ void moveSnake(struct Snake *snake) {
     }
 }
 
+// Detects if there is a wall collision, sets globalBegin = 0 and causes gameover
 void wallCollision(const struct Snake *snake) {
     if (snake->tailX[0] == 0 || snake->tailX[0] == 127 ||
         snake->tailY[0] == 0 || snake->tailY[0] == 31) {
@@ -114,6 +118,7 @@ void wallCollision(const struct Snake *snake) {
         }
 }
 
+// Detects if there is a snake self collision, which causes game over
 void selfCollision(const struct Snake *snake) {
     int i;
     for (i = 1; i < snake->length; ++i) {
@@ -123,6 +128,7 @@ void selfCollision(const struct Snake *snake) {
     }
 }
 
+// Increases snake length
 void increaseLength(struct Snake *snake) {
     int i, j;
     int newY, newX;
@@ -177,6 +183,7 @@ Apple functions
 
 */
 
+// Gives the apple a random starting position
 void initializeApple(struct Apple *apple) {
     // Set initial coordinates for the apple
     apple->x = getRandomNumber(126) + 1;
@@ -184,6 +191,7 @@ void initializeApple(struct Apple *apple) {
     increaseSpeed();
 }
 
+// Checks if snake collides with apple, eats it
 int checkAppleCollision(struct Snake *snake, struct Apple *apple) {
     if (snake->tailX[0] == apple->x && snake->tailY[0] == apple->y) {
         return 1; 
@@ -191,6 +199,7 @@ int checkAppleCollision(struct Snake *snake, struct Apple *apple) {
     return 0;  
 }
 
+// Gives the apple a new location once eaten, increases snake length, and increases score by 1 point 
 void AppleCollisionActions(struct Snake *snake, struct Apple *apple) {
     if (checkAppleCollision(snake, apple)) {
         apple->x = getRandomNumber(126) + 1;
@@ -250,6 +259,7 @@ Start, Play & End game functions
 
 */
 
+// Displays the start menu of the game
 void startGame(struct Snake *snake, struct Apple *apple) {
     int buttons = getbtns();
     int running = 1;
@@ -269,6 +279,7 @@ void startGame(struct Snake *snake, struct Apple *apple) {
 
 }
 
+// Displays the actual snake game
 void playGame(struct Snake *snake, struct Apple *apple) {
     while(globalBegin) {
         processInput(snake);
@@ -283,6 +294,7 @@ void playGame(struct Snake *snake, struct Apple *apple) {
     }    
 }
 
+// Displays the game over page
 void Endgame () {
     char scoreString[8]; // Assuming at most 3 digits for the score + "Score: " prefix
 
