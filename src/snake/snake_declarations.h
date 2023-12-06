@@ -12,6 +12,7 @@ extern int globalBegin;
 extern int score;
 extern int speed;
 
+// Snake object
 struct Snake {
     char direction; 
     int length;
@@ -19,11 +20,11 @@ struct Snake {
     int tailY[MAX_SNAKE_LENGTH]; 
 };
 
+// Apple object
 struct Apple {
     int x;
     int y;
 };
-
 
 void displayFrame(struct Snake *snake, struct Apple *apple);
 void clearDisplay();
