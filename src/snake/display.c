@@ -156,6 +156,7 @@ void clearDisplay() {
 	}
 }
 
+// Displays snake and apple onto the uno32 board
 void displayFrame(struct Snake *snake, struct Apple *apple) {
 	clearDisplay();
 	draw_snake(snake);
