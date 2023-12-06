@@ -56,12 +56,13 @@ int main(void) {
 	SPI2CONSET = 0x8000;
 	
 	display_init();
+
+        // Game loop
 	while( 1 )
 	{
 		//Main function goes here
 		struct Snake snake;
 		struct Apple apple;
-		//initializeSnake(&snake);
 		
 		startGame(&snake, &apple);
 		while(globalBegin) {
