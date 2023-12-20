@@ -1,6 +1,6 @@
 /* game.c
 
-   This file written 2023 by M. Ba Rashd and M. Näsvall
+   This file written 2023 by M. Ba Rashed and M. Näsvall
     
     */
 
@@ -17,6 +17,7 @@
 int globalBegin = 0;
 int score = 0;
 int speed = 120;
+int collision = 0;
 
 // Global variable to store the current state of the PRNG
 static uint32_t prng_state = 0;
@@ -93,7 +94,8 @@ void processInput(struct Snake *snake) {
 /* Function to move the snake by changing it's X and Y coordinates */
 void moveSnake(struct Snake *snake) {
     // Update the tail positions by shifting them
-    for (int i = snake->length - 1; i > 0; --i) {
+    int i;
+    for (i = snake->length - 1; i > 0; --i) {
         snake->tailX[i] = snake->tailX[i - 1];
         snake->tailY[i] = snake->tailY[i - 1];
     }
@@ -114,7 +116,7 @@ void moveSnake(struct Snake *snake) {
 void wallCollision(const struct Snake *snake) {
     if (snake->tailX[0] == 0 || snake->tailX[0] == 127 ||
         snake->tailY[0] == 0 || snake->tailY[0] == 31) {
-            globalBegin = 0;
+            collision = 1;
         }
 }
 
@@ -123,7 +125,7 @@ void selfCollision(const struct Snake *snake) {
     int i;
     for (i = 1; i < snake->length; ++i) {
         if (snake->tailX[0] == snake->tailX[i] && snake->tailY[0] == snake->tailY[i]) {
-            globalBegin = 0;
+            collision = 1;
         }
     }
 }
@@ -188,7 +190,6 @@ void initializeApple(struct Apple *apple) {
     // Set initial coordinates for the apple
     apple->x = getRandomNumber(126) + 1;
     apple->y = getRandomNumber(30) + 1;
-    increaseSpeed();
 }
 
 // Checks if snake collides with apple, eats it
@@ -205,6 +206,7 @@ void AppleCollisionActions(struct Snake *snake, struct Apple *apple) {
         apple->x = getRandomNumber(126) + 1;
         apple->y = getRandomNumber(30) + 1;
         increaseLength(snake);
+        increaseSpeed();
     }
     score++;
 }
@@ -284,13 +286,16 @@ void playGame(struct Snake *snake, struct Apple *apple) {
     while(globalBegin) {
         processInput(snake);
         moveSnake(snake);
+        displayFrame(snake, apple);
         wallCollision(snake);
         selfCollision(snake);
+        if (collision) {
+            globalBegin = 0;
+        }
         if (checkAppleCollision(snake, apple)) {
             AppleCollisionActions(snake, apple);
         }
         delay(speed);
-        displayFrame(snake, apple);
     }    
 }
 
@@ -330,6 +335,8 @@ void Endgame () {
     struct Snake newSnake;
 	struct Apple newApple;
     score = 0;
+    speed = 120;
+    collision = 0;
     startGame(&newSnake, &newApple);
 }
 
